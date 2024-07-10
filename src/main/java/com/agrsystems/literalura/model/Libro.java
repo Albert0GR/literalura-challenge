@@ -13,12 +13,12 @@ public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+    //@Column(unique = true)
     private String titulo;
     @ManyToOne()
     private Autor autor;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    //@ElementCollection(fetch = FetchType.EAGER)
     private List<String> idiomas;
     private Integer numeroDeDescargas;
 
@@ -70,5 +70,15 @@ public class Libro {
 
     public void setNumeroDeDescargas(Integer numeroDeDescargas) {
         this.numeroDeDescargas = numeroDeDescargas;
+    }
+
+    @Override
+    public String toString() {
+        return "-----------Libro ["+ id + "]------------"+ '\n' +
+                " Titulo='" + titulo + '\n' +
+                " Autor=" + autor.getNombre() + '\n' +
+                " Idiomas=" + idiomas + '\n' +
+                " Numero De Descargas=" + numeroDeDescargas + '\n' +
+                "-------------------------------------------------";
     }
 }

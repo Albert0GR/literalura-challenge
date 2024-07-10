@@ -8,6 +8,7 @@ import com.agrsystems.literalura.service.ConsumoAPI;
 import com.agrsystems.literalura.service.ConvierteDatos;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Scanner;
 
 @Component
@@ -17,6 +18,8 @@ public class Principal {
     private final String URL_BASE = "https://gutendex.com/books/?search=";
     private AutorRepository autorRepository;
     private LibroRepository libroRepository;
+
+    private List<Libro> libros;
 
     private final Scanner teclado = new Scanner(System.in);
     private final ConvierteDatos conversor = new ConvierteDatos();
@@ -33,6 +36,7 @@ public class Principal {
             String menu = """
                    
                     1 - Buscar libros por título
+                    2 - Listar libros
                  
                     
                     0 - Salir
@@ -49,6 +53,10 @@ public class Principal {
                     buscarLibroWeb();
                     break;
 
+                case 2:
+                    listarLibros();
+                    break;
+
                 case 0 :
 
                     System.out.println("Saliendo de la aplicación");
@@ -60,6 +68,8 @@ public class Principal {
             }
         }
     }
+
+
 
     private Datos buscarDatosLibros() {
         System.out.println("Ingrese el nombre del libro que desea buscar: ");
@@ -81,5 +91,11 @@ public class Principal {
         } else {
             System.out.println("El libro buscado no se encuentra. Pruebe con otro.");
         }
+    }
+
+    private void listarLibros() {
+        libros = libroRepository.findAll();
+
+        libros.forEach(System.out::println);
     }
 }

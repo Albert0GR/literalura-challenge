@@ -39,6 +39,7 @@ public class Principal {
                     1 - Buscar libros por título
                     2 - Listar libros registrados
                     3-  Listar autores registrados
+                    4- Listar autores vivos en un año determinado
                  
                     
                     0 - Salir
@@ -60,6 +61,10 @@ public class Principal {
                     break;
                 case 3:
                     listarAutores();
+                    break;
+                case 4:
+                    listarAutoresVivosAnioDeterminado();
+                    break;
 
                 case 0 :
 
@@ -150,5 +155,36 @@ public class Principal {
             }
             System.out.println("-------------------------------------");
         }
+    }
+
+    private void listarAutoresVivosAnioDeterminado() {
+
+        System.out.println("Ingrese el año: ");
+        int anio = teclado.nextInt();
+        teclado.nextLine();
+
+        List<Autor> autores = autorRepository.findAll();
+        for (Autor autor : autores) {
+            boolean estaVivo = false;
+            int nacimiento = Integer.parseInt(autor.getFechaDeNacimiento().split("-")[0]);
+            String defuncionStr = autor.getFechaDeDefuncion();
+            int defuncion = defuncionStr != null && !defuncionStr.isEmpty() ? Integer.parseInt(defuncionStr.split("-")[0]) : Integer.MAX_VALUE;
+
+            if (nacimiento <= anio && anio <= defuncion) {
+                estaVivo = true;
+            }
+
+            if (estaVivo) {
+                System.out.println("Nombre: " + autor.getNombre());
+                System.out.println("Fecha de nacimiento: " + autor.getFechaDeNacimiento());
+                System.out.println("Fecha de defunción: " + (defuncionStr == null ? "N/A" : defuncionStr));
+                System.out.println("Libros: ");
+                for (Libro libro : autor.getLibro()) {
+                    System.out.println(" - " + libro.getTitulo());
+                }
+                System.out.println("-------------------------------------");
+            }
+        }
+
     }
 }

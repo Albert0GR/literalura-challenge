@@ -38,11 +38,11 @@ public class Principal {
                     1 - Buscar libros por título
                     2 - Listar libros registrados
                     3-  Listar autores registrados
-                    4- Listar autores vivos en un año determinado
-                    5- listar libros por idioma
-                    6 - top 10 libros
-                    7 - generar estadisticas
-                    8 - buscar autor por nombre de la BD
+                    4-  Listar autores vivos en un año determinado
+                    5-  Listar libros por idioma
+                    6 - Top 10 libros
+                    7 - Generar estadisticas
+                    8 - Buscar autor por nombre en la BD
                                      
                                         
                     0 - Salir
@@ -58,7 +58,6 @@ public class Principal {
                 case 1:
                     buscarLibroWeb();
                     break;
-
                 case 2:
                     listarLibros();
                     break;
@@ -125,7 +124,7 @@ public class Principal {
 
             Libro nuevoLibro = new Libro(datosLibros, autor);
             libroRepository.save(nuevoLibro);
-            System.out.println("Nuevo libro agregado: " + nuevoLibro.getTitulo());
+            System.out.println("Nuevo libro agregado: \n" + nuevoLibro);
 
         } else {
             System.out.println("El libro buscado no se encuentra. Pruebe con otro.");
@@ -149,22 +148,33 @@ public class Principal {
 
 
     private void listarLibros() {
-        libros = libroRepository.findAll();
 
-        libros.forEach(System.out::println);
+        libros = libroRepository.findAll();
+        if (libros.isEmpty()){
+            System.out.println("La base de datos esta vacia");
+        }else{
+            libros.forEach(System.out::println);
+        }
+
+
     }
 
     private void listarAutores() {
         List<Autor> autores = autorRepository.findAll();
-        for (Autor autor : autores) {
-            System.out.println("Nombre: " + autor.getNombre());
-            System.out.println("Fecha de nacimiento: " + autor.getFechaDeNacimiento());
-            System.out.println("Fecha de defunción: " + autor.getFechaDeDefuncion());
-            System.out.println("Libros: ");
-            for (Libro libro : autor.getLibro()) {
-                System.out.println(" - " + libro.getTitulo());
+        if (autores.isEmpty()){
+            System.out.println("La base de datos esta vacia");
+        }else {
+
+            for (Autor autor : autores) {
+                System.out.println("Nombre: " + autor.getNombre());
+                System.out.println("Fecha de nacimiento: " + autor.getFechaDeNacimiento());
+                System.out.println("Fecha de defunción: " + autor.getFechaDeDefuncion());
+                System.out.println("Libros: ");
+                for (Libro libro : autor.getLibro()) {
+                    System.out.println(" - " + libro.getTitulo());
+                }
+                System.out.println("-------------------------------------");
             }
-            System.out.println("-------------------------------------");
         }
     }
 
@@ -177,18 +187,19 @@ public class Principal {
         List<Autor> autores = autorRepository.findAll();
         for (Autor autor : autores) {
             boolean estaVivo = false;
-            int nacimiento = Integer.parseInt(autor.getFechaDeNacimiento().split("-")[0]);
-            String defuncionStr = autor.getFechaDeDefuncion();
-            int defuncion = defuncionStr != null && !defuncionStr.isEmpty() ? Integer.parseInt(defuncionStr.split("-")[0]) : Integer.MAX_VALUE;
+            int nacimiento = autor.getFechaDeNacimiento();
+            int defuncionStr = autor.getFechaDeDefuncion();
 
-            if (nacimiento <= anio && anio <= defuncion) {
+            int defuncion = Integer.MAX_VALUE;
+
+            if (nacimiento <= anio) {
                 estaVivo = true;
             }
 
             if (estaVivo) {
                 System.out.println("Nombre: " + autor.getNombre());
                 System.out.println("Fecha de nacimiento: " + autor.getFechaDeNacimiento());
-                System.out.println("Fecha de defunción: " + (defuncionStr == null ? "N/A" : defuncionStr));
+                System.out.println("Fecha de defunción: " + autor.getFechaDeDefuncion());
                 System.out.println("Libros: ");
                 for (Libro libro : autor.getLibro()) {
                     System.out.println(" - " + libro.getTitulo());

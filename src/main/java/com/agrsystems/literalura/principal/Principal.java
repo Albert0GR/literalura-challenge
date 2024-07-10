@@ -183,20 +183,13 @@ public class Principal {
         System.out.println("Ingrese el año: ");
         int anio = teclado.nextInt();
         teclado.nextLine();
+        List<Autor> autores = autorRepository.estaVivo(anio);
 
-        List<Autor> autores = autorRepository.findAll();
-        for (Autor autor : autores) {
-            boolean estaVivo = false;
-            int nacimiento = autor.getFechaDeNacimiento();
-            int defuncionStr = autor.getFechaDeDefuncion();
-
-            int defuncion = Integer.MAX_VALUE;
-
-            if (nacimiento <= anio) {
-                estaVivo = true;
-            }
-
-            if (estaVivo) {
+        if (autores.isEmpty()) {
+            System.out.println("No se encontraron autores vivos en esta fecha");
+        } else {
+            System.out.println("Autores vivos en el año: "+ anio+ "\n");
+            for (Autor autor : autores) {
                 System.out.println("Nombre: " + autor.getNombre());
                 System.out.println("Fecha de nacimiento: " + autor.getFechaDeNacimiento());
                 System.out.println("Fecha de defunción: " + autor.getFechaDeDefuncion());

@@ -31,3 +31,4 @@
 
 
 ## Video de funcionalidad
+[![Thumbnail tomada de youtube](https://img.youtube.com/vi/XQvA6avW36c/0.jpg)](https://www.youtube.com/watch?v=XQvA6avW36c "Challenge Literalura")

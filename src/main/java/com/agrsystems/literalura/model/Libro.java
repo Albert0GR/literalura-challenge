@@ -77,7 +77,7 @@ public class Libro {
         return "-----------Libro ["+ id + "]------------"+ '\n' +
                 " Titulo='" + titulo + '\n' +
                 " Autor=" + autor.getNombre() + '\n' +
-                " Idiomas=" + idiomas + '\n' +
+                " Idiomas=" + idiomas.get(0) + '\n' +
                 " Numero De Descargas=" + numeroDeDescargas + '\n' +
                 "-------------------------------------------------";
     }

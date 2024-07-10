@@ -40,6 +40,7 @@ public class Principal {
                     2 - Listar libros registrados
                     3-  Listar autores registrados
                     4- Listar autores vivos en un año determinado
+                    5- listar libros por idioma
                  
                     
                     0 - Salir
@@ -65,7 +66,9 @@ public class Principal {
                 case 4:
                     listarAutoresVivosAnioDeterminado();
                     break;
-
+                case 5:
+                    listarLibrosPorIdioma();
+                    break;
                 case 0 :
 
                     System.out.println("Saliendo de la aplicación");
@@ -187,4 +190,54 @@ public class Principal {
         }
 
     }
+
+    private void listarLibrosPorIdioma() {
+        String idioma = obtenerIdiomaSeleccionado();
+
+        if (idioma.isEmpty()) {
+            System.out.println("Idioma no válido.");
+            return;
+        }
+
+        List<Libro> librosPorIdioma = libroRepository.findLibrosByIdioma(idioma);
+        if (librosPorIdioma.isEmpty()) {
+            System.out.println("No se encontraron libros en el idioma especificado.");
+        } else {
+            System.out.println("Libros en " + idioma + ":");
+            for (Libro libro : librosPorIdioma) {
+                System.out.println("Título: " + libro.getTitulo());
+                System.out.println("Autor: " + libro.getAutor().getNombre());
+                System.out.println("-------------------------------------");
+            }
+        }
+    }
+
+    private String obtenerIdiomaSeleccionado() {
+        String idioma = "";
+        String menu = """
+            Seleccione el idioma del libro que desea encontrar:
+            \n---------------------------------------------------
+            \n1 - Español
+            \n2 - Francés
+            \n3 - Inglés
+            \n4 - Portugués
+            \n----------------------------------------------------\n""";
+        System.out.println(menu);
+
+        try {
+            int opcion = Integer.parseInt(this.teclado.nextLine());
+            switch (opcion) {
+                case 1 -> idioma = "es";
+                case 2 -> idioma = "fr";
+                case 3 -> idioma = "en";
+                case 4 -> idioma = "pt";
+                default -> System.out.println("Opción inválida!");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Opción no válida: " + e.getMessage());
+        }
+
+        return idioma;
+    }
+
 }

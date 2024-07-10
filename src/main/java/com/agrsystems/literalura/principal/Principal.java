@@ -8,9 +8,8 @@ import com.agrsystems.literalura.service.ConsumoAPI;
 import com.agrsystems.literalura.service.ConvierteDatos;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class Principal {
@@ -25,7 +24,7 @@ public class Principal {
     private final Scanner teclado = new Scanner(System.in);
     private final ConvierteDatos conversor = new ConvierteDatos();
 
-    public Principal(LibroRepository libroRepository,AutorRepository autorRepository){
+    public Principal(LibroRepository libroRepository, AutorRepository autorRepository) {
         this.autorRepository = autorRepository;
         this.libroRepository = libroRepository;
     }
@@ -35,14 +34,17 @@ public class Principal {
         int opcion = -1;
         while (opcion != 0) {
             String menu = """
-                   
+                                       
                     1 - Buscar libros por título
                     2 - Listar libros registrados
                     3-  Listar autores registrados
                     4- Listar autores vivos en un año determinado
                     5- listar libros por idioma
-                 
-                    
+                    6 - top 10 libros
+                    7 - generar estadisticas
+                    8 - buscar autor por nombre de la BD
+                                     
+                                        
                     0 - Salir
                     """;
             System.out.println(menu);
@@ -53,7 +55,7 @@ public class Principal {
             opcion = teclado.nextInt();
             teclado.nextLine();
             switch (opcion) {
-                case 1 :
+                case 1:
                     buscarLibroWeb();
                     break;
 
@@ -69,19 +71,26 @@ public class Principal {
                 case 5:
                     listarLibrosPorIdioma();
                     break;
-                case 0 :
+                case 6:
+                    top10();
+                    break;
+                case 7:
+                    estadisticas();
+                    break;
+                case 8:
+                    buscarAutorPorNombre();
+                    break;
+                case 0:
 
                     System.out.println("Saliendo de la aplicación");
                     System.exit(0);
 
-                break;
-                default :
+                    break;
+                default:
                     System.out.println("Opción inválida");
             }
         }
     }
-
-
 
 
     private Datos buscarDatosLibros() {
@@ -137,7 +146,6 @@ public class Principal {
             System.out.println("El libro buscado no se encuentra. Pruebe con otro.");
         }
     }*/
-
 
 
     private void listarLibros() {
@@ -215,13 +223,13 @@ public class Principal {
     private String obtenerIdiomaSeleccionado() {
         String idioma = "";
         String menu = """
-            Seleccione el idioma del libro que desea encontrar:
-            \n---------------------------------------------------
-            \n1 - Español
-            \n2 - Francés
-            \n3 - Inglés
-            \n4 - Portugués
-            \n----------------------------------------------------\n""";
+                Seleccione el idioma del libro que desea encontrar:
+                \n---------------------------------------------------
+                \n1 - Español
+                \n2 - Francés
+                \n3 - Inglés
+                \n4 - Portugués
+                \n----------------------------------------------------\n""";
         System.out.println(menu);
 
         try {
@@ -240,4 +248,51 @@ public class Principal {
         return idioma;
     }
 
+    private void top10() {
+        System.out.println("Top 10 libros más descargados");
+        var json = consumoApi.obtenerDatos(URL_BASE);
+        var datos = conversor.obtenerDatos(json, Datos.class);
+
+        datos.resultados().stream()
+                .sorted(Comparator.comparing(DatosLibros::numeroDeDescargas).reversed())
+                .limit(10)
+                .map(l -> l.titulo().toUpperCase())
+                .forEach(System.out::println);
+    }
+
+    private void estadisticas() {
+        //Trabajando con estadisticas
+        var json = consumoApi.obtenerDatos(URL_BASE);
+        var datos = conversor.obtenerDatos(json, Datos.class);
+        DoubleSummaryStatistics est = datos.resultados().stream()
+                .filter(d -> d.numeroDeDescargas() > 0)
+                .collect(Collectors.summarizingDouble(DatosLibros::numeroDeDescargas));
+        System.out.println("Cantidad media de descargas: " + est.getAverage());
+        System.out.println("Cantidad máxima de descargas: " + est.getMax());
+        System.out.println("Cantidad mínima de descargas: " + est.getMin());
+        System.out.println("Cantidad de registros evaluados para calcular las estadisticas: " + est.getCount());
+
+    }
+
+    private void buscarAutorPorNombre() {
+        System.out.println("Ingrese el nombre del autor que desea buscar: ");
+        String nombre = teclado.nextLine();
+
+        List<Autor> autores = autorRepository.findByNombredb(nombre);
+        if (autores.isEmpty()) {
+            System.out.println("No se encontraron autores con el nombre especificado.");
+        } else {
+            for (Autor autor : autores) {
+                System.out.println("Nombre: " + autor.getNombre());
+                System.out.println("Fecha de nacimiento: " + autor.getFechaDeNacimiento());
+                System.out.println("Fecha de defunción: " + autor.getFechaDeDefuncion());
+                System.out.println("Libros: ");
+                for (Libro libro : autor.getLibro()) {
+                    System.out.println(" - " + libro.getTitulo());
+                }
+                System.out.println("-------------------------------------");
+            }
+        }
+
+    }
 }

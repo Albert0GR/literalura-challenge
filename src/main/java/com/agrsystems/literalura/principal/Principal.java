@@ -9,6 +9,7 @@ import com.agrsystems.literalura.service.ConvierteDatos;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 @Component
@@ -83,6 +84,38 @@ public class Principal {
         if (!datos.resultados().isEmpty()) {
             DatosLibros datosLibros = datos.resultados().get(0);
             DatosAutor datosAutor = datosLibros.autor().get(0);
+
+            Optional<Libro> libroExistente = libroRepository.findByTitulo(datosLibros.titulo());
+            if (libroExistente.isPresent()) {
+                System.out.println("El libro ya está en la base de datos.");
+                return;
+            }
+
+            Optional<Autor> autorExistente = autorRepository.findByNombre(datosAutor.nombre());
+            Autor autor;
+            if (autorExistente.isPresent()) {
+                autor = autorExistente.get();
+                System.out.println("Autor existente encontrado: " + autor.getNombre());
+            } else {
+                autor = new Autor(datosAutor);
+                autorRepository.save(autor);
+                System.out.println("Nuevo autor agregado: " + autor.getNombre());
+            }
+
+            Libro nuevoLibro = new Libro(datosLibros, autor);
+            libroRepository.save(nuevoLibro);
+            System.out.println("Nuevo libro agregado: " + nuevoLibro.getTitulo());
+
+        } else {
+            System.out.println("El libro buscado no se encuentra. Pruebe con otro.");
+        }
+    }
+
+   /* private void buscarLibroWeb() {
+        Datos datos = buscarDatosLibros();
+        if (!datos.resultados().isEmpty()) {
+            DatosLibros datosLibros = datos.resultados().get(0);
+            DatosAutor datosAutor = datosLibros.autor().get(0);
             System.out.println("Título: " + datosLibros.titulo());
             System.out.println("Autor: " + datosAutor.nombre());
             Autor autorNuevo = new Autor(datosAutor);
@@ -91,7 +124,9 @@ public class Principal {
         } else {
             System.out.println("El libro buscado no se encuentra. Pruebe con otro.");
         }
-    }
+    }*/
+
+
 
     private void listarLibros() {
         libros = libroRepository.findAll();

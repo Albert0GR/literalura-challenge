@@ -37,7 +37,8 @@ public class Principal {
             String menu = """
                    
                     1 - Buscar libros por título
-                    2 - Listar libros
+                    2 - Listar libros registrados
+                    3-  Listar autores registrados
                  
                     
                     0 - Salir
@@ -57,6 +58,8 @@ public class Principal {
                 case 2:
                     listarLibros();
                     break;
+                case 3:
+                    listarAutores();
 
                 case 0 :
 
@@ -69,6 +72,7 @@ public class Principal {
             }
         }
     }
+
 
 
 
@@ -132,5 +136,19 @@ public class Principal {
         libros = libroRepository.findAll();
 
         libros.forEach(System.out::println);
+    }
+
+    private void listarAutores() {
+        List<Autor> autores = autorRepository.findAll();
+        for (Autor autor : autores) {
+            System.out.println("Nombre: " + autor.getNombre());
+            System.out.println("Fecha de nacimiento: " + autor.getFechaDeNacimiento());
+            System.out.println("Fecha de defunción: " + autor.getFechaDeDefuncion());
+            System.out.println("Libros: ");
+            for (Libro libro : autor.getLibro()) {
+                System.out.println(" - " + libro.getTitulo());
+            }
+            System.out.println("-------------------------------------");
+        }
     }
 }
